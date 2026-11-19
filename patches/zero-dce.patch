@@ -1,0 +1,35 @@
+diff --git a/Zero-DCE_code/dataloader.py b/Zero-DCE_code/dataloader.py
+index e01217c..fef2a7f 100644
+--- a/Zero-DCE_code/dataloader.py
++++ b/Zero-DCE_code/dataloader.py
+@@ -47,7 +47,7 @@ class lowlight_loader(data.Dataset):
+ 		
+ 		data_lowlight = Image.open(data_lowlight_path)
+ 		
+-		data_lowlight = data_lowlight.resize((self.size,self.size), Image.ANTIALIAS)
++		data_lowlight = data_lowlight.resize((self.size,self.size), Image.LANCZOS)
+ 
+ 		data_lowlight = (np.asarray(data_lowlight)/255.0) 
+ 		data_lowlight = torch.from_numpy(data_lowlight).float()
+diff --git a/Zero-DCE_code/lowlight_train.py b/Zero-DCE_code/lowlight_train.py
+index 7743e8d..e0c4ca9 100644
+--- a/Zero-DCE_code/lowlight_train.py
++++ b/Zero-DCE_code/lowlight_train.py
+@@ -28,7 +28,7 @@ def weights_init(m):
+ 
+ def train(config):
+ 
+-	os.environ['CUDA_VISIBLE_DEVICES']='0'
++	# GPU chosen via CUDA_VISIBLE_DEVICES
+ 
+ 	DCE_net = model.enhance_net_nopool().cuda()
+ 
+@@ -75,7 +75,7 @@ def train(config):
+ 			
+ 			optimizer.zero_grad()
+ 			loss.backward()
+-			torch.nn.utils.clip_grad_norm(DCE_net.parameters(),config.grad_clip_norm)
++			torch.nn.utils.clip_grad_norm_(DCE_net.parameters(),config.grad_clip_norm)
+ 			optimizer.step()
+ 
+ 			if ((iteration+1) % config.display_iter) == 0:
